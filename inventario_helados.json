@@ -1,0 +1,227 @@
+{
+    "Mango Enchilado": {
+        "costo": 700,
+        "precio": 1500,
+        "stock": 580
+    },
+    "Fusión de Sabores": {
+        "costo": 893,
+        "precio": 1600,
+        "stock": 76
+    },
+    "Mango Super Ácido": {
+        "costo": 688,
+        "precio": 1700,
+        "stock": 22
+    },
+    "Piña Enchilada": {
+        "costo": 550,
+        "precio": 1500,
+        "stock": 60
+    },
+    "Fusión Tropical": {
+        "costo": 830,
+        "precio": 1700,
+        "stock": 40
+    },
+    "Milo Cremoso": {
+        "costo": 780,
+        "precio": 2000,
+        "stock": 30
+    },
+    "Mango Tamarindo": {
+        "costo": 634,
+        "precio": 1400,
+        "stock": 80
+    },
+    "Mousse Maracuyá": {
+        "costo": 950,
+        "precio": 2000,
+        "stock": 25
+    },
+    "Chicle Fantasía": {
+        "costo": 740,
+        "precio": 1800,
+        "stock": 45
+    },
+    "Brownie": {
+        "costo": 820,
+        "precio": 2000,
+        "stock": 5
+    },
+    "Fresa Crema": {
+        "costo": 673,
+        "precio": 2000,
+        "stock": 40
+    },
+    "Frutas con Crema": {
+        "costo": 1100,
+        "precio": 2100,
+        "stock": 20
+    },
+    "Gomiloco": {
+        "costo": 1277,
+        "precio": 2300,
+        "stock": 15
+    },
+    "Helado Quipitos": {
+        "costo": 1457,
+        "precio": 2500,
+        "stock": 10
+    },
+    "Mango Trolulu": {
+        "costo": 720,
+        "precio": 1500,
+        "stock": 90
+    },
+    "Helado y Casa": {
+        "costo": 1100,
+        "precio": 2100,
+        "stock": 25
+    },
+    "Mango Kiwi": {
+        "costo": 800,
+        "precio": 1600,
+        "stock": 70
+    },
+    "Trisabor": {
+        "costo": 786,
+        "precio": 1400,
+        "stock": 55
+    },
+    "Mango Pipop Chi": {
+        "costo": 727,
+        "precio": 1800,
+        "stock": 60
+    },
+    "Mango Manzana": {
+        "costo": 640,
+        "precio": 1400,
+        "stock": 75
+    },
+    "Chocorramo": {
+        "costo": 720,
+        "precio": 2000,
+        "stock": 40
+    },
+    "Mango Piña": {
+        "costo": 600,
+        "precio": 1200,
+        "stock": 80
+    },
+    "Mango Fresa": {
+        "costo": 565,
+        "precio": 1200,
+        "stock": 90
+    },
+    "Mango Chamoy": {
+        "costo": 800,
+        "precio": 1500,
+        "stock": 60
+    },
+    "Mango Biche": {
+        "costo": 400,
+        "precio": 900,
+        "stock": 90
+    },
+    "Maracumango": {
+        "costo": 400,
+        "precio": 1000,
+        "stock": 80
+    },
+    "Mango Lulo": {
+        "costo": 590,
+        "precio": 1600,
+        "stock": 75
+    },
+    "Queso Bocadillo": {
+        "costo": 800,
+        "precio": 2100,
+        "stock": 50
+    },
+    "Queso Arequipe": {
+        "costo": 814,
+        "precio": 2100,
+        "stock": 45
+    },
+    "Veteado Mora": {
+        "costo": 814,
+        "precio": 2100,
+        "stock": 55
+    },
+    "Super Coco": {
+        "costo": 950,
+        "precio": 2000,
+        "stock": 35
+    },
+    "Fresa Cremoso": {
+        "costo": 650,
+        "precio": 1600,
+        "stock": 70
+    },
+    "Oreo": {
+        "costo": 800,
+        "precio": 1800,
+        "stock": 65
+    },
+    "Tropical": {
+        "costo": 950,
+        "precio": 2100,
+        "stock": 40
+    },
+    "Capuchino R.": {
+        "costo": 1004,
+        "precio": 2000,
+        "stock": 30
+    },
+    "Arequipe Brownie": {
+        "costo": 950,
+        "precio": 2100,
+        "stock": 25
+    },
+    "Hershey": {
+        "costo": 1440,
+        "precio": 2300,
+        "stock": 20
+    },
+    "Snicker": {
+        "costo": 1050,
+        "precio": 2100,
+        "stock": 35
+    },
+    "Bon Bon Cremoso": {
+        "costo": 880,
+        "precio": 2100,
+        "stock": 45
+    },
+    "Mix de Frutas": {
+        "costo": 880,
+        "precio": 1700,
+        "stock": 50
+    },
+    "Piña Colada": {
+        "costo": 1100,
+        "precio": 2100,
+        "stock": 40
+    },
+    "Mamón": {
+        "costo": 600,
+        "precio": 1500,
+        "stock": 60
+    },
+    "Mango Bubals": {
+        "costo": 806,
+        "precio": 1600,
+        "stock": 75
+    },
+    "Mango Mandar": {
+        "costo": 600,
+        "precio": 1300,
+        "stock": 80
+    },
+    "Mango Bocadillo": {
+        "costo": 650,
+        "precio": 1400,
+        "stock": 75
+    }
+}

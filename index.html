@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Heladería</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="contenedor">
+        <header>
+            <h1>📊 Dashboard Analítico - Heladería</h1>
+            <p>Análisis financiero y rendimiento de ventas</p>
+        </header>
+
+        <div style="text-align: right; margin-bottom: 20px;">
+            <label for="filtro-mes" style="font-weight: bold; font-size: 1.1rem;">📅 Filtrar por Mes: </label>
+            <select id="filtro-mes" style="padding: 5px 10px; font-size: 1rem; border-radius: 5px;">
+                <option value="todos">Histórico Completo (Todos los meses)</option>
+                </select>
+        </div>
+
+        <div class="tarjetas-kpi">
+            <div class="tarjeta azul">
+                <h3>Ingresos Totales</h3>
+                <p id="kpi-ingresos">$0</p>
+            </div>
+            <div class="tarjeta verde">
+                <h3>Ganancia (Utilidad)</h3>
+                <p id="kpi-utilidad">$0</p>
+            </div>
+            <div class="tarjeta naranja">
+                <h3>Facturas Emitidas</h3>
+                <p id="kpi-facturas">0</p>
+            </div>
+        </div>
+
+        <div class="zona-graficos">
+            <div class="grafico-contenedor">
+                <h2>Tendencia de Ingresos</h2>
+                <canvas id="graficoVentas"></canvas>
+            </div>
+            
+            <div class="reportes-grid">
+                <div class="tabla-reporte">
+                    <h2>Rendimiento por Día</h2>
+                    <table id="tabla-dias">
+                        <thead><tr><th>Fecha</th><th>Ingresos</th><th>Ganancia Neta</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div class="tabla-reporte">
+                    <h2>Rendimiento por Mes</h2>
+                    <table id="tabla-meses">
+                        <thead><tr><th>Mes</th><th>Ingresos</th><th>Ganancia Neta</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div class="tabla-reporte">
+                    <h2>Productos Estrella</h2>
+                    <table id="tabla-productos">
+                        <thead><tr><th>Producto</th><th>Cant.</th><th>Ingresos</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

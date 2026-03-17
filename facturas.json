@@ -1,0 +1,43 @@
+[
+    {
+        "fecha": "2026-03-17 10:06:16",
+        "cliente_documento": "100000000",
+        "cliente_nombre": "THOMAS - BARRIO MONTES",
+        "total_venta": 12400,
+        "total_costo": 6372,
+        "utilidad": 6028,
+        "detalle_productos": [
+            {
+                "sabor": "Mango Enchilado",
+                "cantidad": 4,
+                "costo_total": 2800,
+                "venta_total": 6000,
+                "ganancia": 3200
+            },
+            {
+                "sabor": "Fusión de Sabores",
+                "cantidad": 4,
+                "costo_total": 3572,
+                "venta_total": 6400,
+                "ganancia": 2828
+            }
+        ]
+    },
+    {
+        "fecha": "2026-03-17 10:09:03",
+        "cliente_documento": "1001942314",
+        "cliente_nombre": "LUIS MEDRANO",
+        "total_venta": 16000,
+        "total_costo": 8930,
+        "utilidad": 7070,
+        "detalle_productos": [
+            {
+                "sabor": "Fusión de Sabores",
+                "cantidad": 10,
+                "costo_total": 8930,
+                "venta_total": 16000,
+                "ganancia": 7070
+            }
+        ]
+    }
+]
