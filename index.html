@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,18 +8,29 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
     <div class="contenedor">
         <header>
-            <h1>📊 Dashboard Analítico - Heladería</h1>
+            <h1>Dashboard Analítico - Helados El Pechi</h1>
             <p>Análisis financiero y rendimiento de ventas</p>
         </header>
 
-        <div style="text-align: right; margin-bottom: 20px;">
-            <label for="filtro-mes" style="font-weight: bold; font-size: 1.1rem;">📅 Filtrar por Mes: </label>
-            <select id="filtro-mes" style="padding: 5px 10px; font-size: 1rem; border-radius: 5px;">
-                <option value="todos">Histórico Completo (Todos los meses)</option>
+        <div class="filtros-contenedor"
+            style="display: flex; gap: 20px; justify-content: flex-end; margin-bottom: 20px; align-items: center; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+            <div>
+                <label for="filtro-mes" style="font-weight: bold;">📅 Mes: </label>
+                <select id="filtro-mes" style="padding: 5px 10px; border-radius: 5px; border: 1px solid #ddd;">
+                    <option value="todos">Todos los meses</option>
                 </select>
+            </div>
+            <div>
+                <label for="filtro-dia" style="font-weight: bold;">📆 Día: </label>
+                <input type="date" id="filtro-dia"
+                    style="padding: 5px 10px; border-radius: 5px; border: 1px solid #ddd;">
+            </div>
+            <button onclick="limpiarFiltros()"
+                style="padding: 5px 15px; background: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer;">Limpiar</button>
         </div>
 
         <div class="tarjetas-kpi">
@@ -26,13 +38,31 @@
                 <h3>Ingresos Totales</h3>
                 <p id="kpi-ingresos">$0</p>
             </div>
+            <div class="tarjeta roja" style="background-color: #e57373;">
+                <h3>Costo Total</h3>
+                <p id="kpi-costo">$0</p>
+            </div>
             <div class="tarjeta verde">
                 <h3>Ganancia (Utilidad)</h3>
                 <p id="kpi-utilidad">$0</p>
             </div>
+            <div class="tarjeta purpura" style="background-color: #673AB7; color: white;">
+                <h3>Distribución (70%)</h3>
+                <p id="kpi-70">$0</p>
+            </div>
+            <div class="tarjeta purpura" style="background-color: #9575CD; color: white;">
+                <h3>Distribución (30%)</h3>
+                <p id="kpi-30">$0</p>
+            </div>
             <div class="tarjeta naranja">
                 <h3>Facturas Emitidas</h3>
                 <p id="kpi-facturas">0</p>
+            </div>
+            <div class="tarjeta purpura" style="background-color: #607D8B; color: white;">
+                <h3>Resumen de Pagos</h3>
+                <div id="kpi-pagos" style="font-size: 0.9rem; margin-top: 10px; text-align: left;">
+                    Esperando datos...
+                </div>
             </div>
         </div>
 
@@ -41,34 +71,71 @@
                 <h2>Tendencia de Ingresos</h2>
                 <canvas id="graficoVentas"></canvas>
             </div>
-            
+
             <div class="reportes-grid">
                 <div class="tabla-reporte">
                     <h2>Rendimiento por Día</h2>
-                    <table id="tabla-dias">
-                        <thead><tr><th>Fecha</th><th>Ingresos</th><th>Ganancia Neta</th></tr></thead>
-                        <tbody></tbody>
-                    </table>
+                    <div class="tabla-scroll">
+                        <table id="tabla-dias">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Ingresos</th>
+                                    <th>Costo</th>
+                                    <th>Ganancia</th>
+                                    <th>70%</th>
+                                    <th>30%</th>
+                                    <th>Pagos</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <div class="tabla-reporte">
                     <h2>Rendimiento por Mes</h2>
                     <table id="tabla-meses">
-                        <thead><tr><th>Mes</th><th>Ingresos</th><th>Ganancia Neta</th></tr></thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-
-                <div class="tabla-reporte">
-                    <h2>Productos Estrella</h2>
-                    <table id="tabla-productos">
-                        <thead><tr><th>Producto</th><th>Cant.</th><th>Ingresos</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Mes</th>
+                                <th>Ingresos</th>
+                                <th>Ganancia Neta</th>
+                                <th>Formas de Pago</th>
+                            </tr>
+                        </thead>
                         <tbody></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-    <script src="app.js"></script>
+        <div style="margin-top: 40px;">
+            <div class="tabla-reporte" style="width: 100%;">
+                <h2>📦 Ventas por Producto (Todos los Productos)</h2>
+                <table id="tabla-productos-completa">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad Vendida</th>
+                            <th>Ingresos</th>
+                            <th>% del Total</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div
+            style="margin-top: 40px; background-color: #f5f5f5; padding: 20px; border-radius: 8px; border-left: 5px solid #FF9800;">
+            <h2>💡 Análisis y Sugerencias de Ventas</h2>
+            <div id="analisis-contenedor" style="font-size: 1rem; line-height: 1.8;">
+                <p>Cargando análisis...</p>
+            </div>
+        </div>
+
+        <script src="app.js"></script>
 </body>
+
 </html>

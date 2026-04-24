@@ -1,14 +1,16 @@
 ========================================
-             HELADERÍA POS             
+          HELADERÍA POS
 ========================================
-FECHA: 2026-03-17 09:53:20
-CLIENTE: Cliente Casual
-DOCUMENTO: 00000000
+FECHA: 2026-04-21 18:53:51
+CLIENTE: ALEJO
+DOC: 1234567
 ----------------------------------------
 CANT  | PRODUCTO                  | TOTAL
 ----------------------------------------
-4     | Mango Enchilado         | $6,000
+23    | Maracumango             | $23,000
+19    | Mango Chamoy            | $28,500
+2     | Mango Piña              | $2,400
 ----------------------------------------
-TOTAL PAGADO:                 $6,000
+TOTAL PAGADO:                 $53,900
 ========================================
-        ¡Gracias por su compra!        
+      ¡Gracias por su compra!

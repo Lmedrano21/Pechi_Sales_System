@@ -1,29 +1,5 @@
 [
     {
-        "fecha": "2026-03-17 10:06:16",
-        "cliente_documento": "100000000",
-        "cliente_nombre": "THOMAS - BARRIO MONTES",
-        "total_venta": 12400,
-        "total_costo": 6372,
-        "utilidad": 6028,
-        "detalle_productos": [
-            {
-                "sabor": "Mango Enchilado",
-                "cantidad": 4,
-                "costo_total": 2800,
-                "venta_total": 6000,
-                "ganancia": 3200
-            },
-            {
-                "sabor": "Fusión de Sabores",
-                "cantidad": 4,
-                "costo_total": 3572,
-                "venta_total": 6400,
-                "ganancia": 2828
-            }
-        ]
-    },
-    {
         "fecha": "2026-03-17 10:09:03",
         "cliente_documento": "1001942314",
         "cliente_nombre": "LUIS MEDRANO",
@@ -37,6 +13,207 @@
                 "costo_total": 8930,
                 "venta_total": 16000,
                 "ganancia": 7070
+            }
+        ]
+    },
+    {
+        "fecha": "2026-03-28 20:41:24",
+        "cliente_documento": "1001942314",
+        "cliente_nombre": "LUIS MEDRANO",
+        "total_venta": 7500,
+        "total_costo": 2750,
+        "utilidad": 4750,
+        "detalle_productos": [
+            {
+                "sabor": "Piña Enchilada",
+                "cantidad": 5,
+                "costo_total": 2750,
+                "venta_total": 7500,
+                "ganancia": 4750
+            }
+        ]
+    },
+    {
+        "fecha": "2026-03-28 20:45:10",
+        "cliente_documento": "00000000",
+        "cliente_nombre": "Cliente Casual",
+        "total_venta": 22100,
+        "total_costo": 10790,
+        "utilidad": 11310,
+        "detalle_productos": [
+            {
+                "sabor": "Fusión Tropical",
+                "cantidad": 13,
+                "costo_total": 10790,
+                "venta_total": 22100
+            }
+        ]
+    },
+    {
+        "fecha": "2026-03-28 20:45:13",
+        "cliente_documento": "00000000",
+        "cliente_nombre": "Cliente Casual",
+        "total_venta": 2800,
+        "total_costo": 1268,
+        "utilidad": 1532,
+        "detalle_productos": [
+            {
+                "sabor": "Mango Tamarindo",
+                "cantidad": 2,
+                "costo_total": 1268,
+                "venta_total": 2800
+            }
+        ]
+    },
+    {
+        "fecha": "2026-03-28 20:45:21",
+        "cliente_documento": "00000000",
+        "cliente_nombre": "Cliente Casual",
+        "total_venta": 4000,
+        "total_costo": 1640,
+        "utilidad": 2360,
+        "detalle_productos": [
+            {
+                "sabor": "Brownie",
+                "cantidad": 2,
+                "costo_total": 1640,
+                "venta_total": 4000
+            }
+        ]
+    },
+    {
+        "fecha": "2026-03-28 20:45:27",
+        "cliente_documento": "00000000",
+        "cliente_nombre": "Cliente Casual",
+        "total_venta": 30400,
+        "total_costo": 15314,
+        "utilidad": 15086,
+        "detalle_productos": [
+            {
+                "sabor": "Mango Bubals",
+                "cantidad": 19,
+                "costo_total": 15314,
+                "venta_total": 30400
+            }
+        ]
+    },
+    {
+        "fecha": "2026-04-15 20:30:23",
+        "cliente_documento": "1234567",
+        "cliente_nombre": "ALEJO",
+        "metodo_pago": "Transferencia",
+        "total_venta": 27200,
+        "total_costo": 15181,
+        "utilidad": 12019,
+        "detalle_productos": [
+            {
+                "sabor": "Fusión de Sabores",
+                "cantidad": 17,
+                "costo_total": 15181,
+                "venta_total": 27200,
+                "ganancia": 12019
+            }
+        ]
+    },
+    {
+        "fecha": "2026-04-15 20:33:18",
+        "cliente_documento": "1234567",
+        "cliente_nombre": "ALEJO",
+        "metodo_pago": "Efectivo",
+        "total_venta": 10800,
+        "total_costo": 4440,
+        "utilidad": 6360,
+        "detalle_productos": [
+            {
+                "sabor": "Chicle Fantasía",
+                "cantidad": 6,
+                "costo_total": 4440,
+                "venta_total": 10800,
+                "ganancia": 6360
+            }
+        ]
+    },
+    {
+        "fecha": "2026-04-21 15:56:09",
+        "cliente_documento": "100000000",
+        "cliente_nombre": "THOMAS - BARRIO MONTES",
+        "metodo_pago": "Efectivo",
+        "total_venta": 182700,
+        "total_costo": 82650,
+        "utilidad": 100050,
+        "detalle_productos": [
+            {
+                "sabor": "Arequipe Brownie",
+                "cantidad": 87,
+                "costo_total": 82650,
+                "venta_total": 182700,
+                "ganancia": 100050
+            }
+        ]
+    },
+    {
+        "fecha": "2026-04-21 16:07:36",
+        "cliente_documento": "00000000",
+        "cliente_nombre": "Cliente Casual",
+        "metodo_pago": "Efectivo",
+        "total_venta": 468000,
+        "total_costo": 191880,
+        "utilidad": 276120,
+        "detalle_productos": [
+            {
+                "sabor": "Brownie",
+                "cantidad": 234,
+                "costo_total": 191880,
+                "venta_total": 468000
+            }
+        ]
+    },
+    {
+        "fecha": "2026-04-21 16:08:04",
+        "cliente_documento": "00000000",
+        "cliente_nombre": "Cliente Casual",
+        "metodo_pago": "Efectivo",
+        "total_venta": 6000,
+        "total_costo": 3012,
+        "utilidad": 2988,
+        "detalle_productos": [
+            {
+                "sabor": "Capuchino R.",
+                "cantidad": 3,
+                "costo_total": 3012,
+                "venta_total": 6000
+            }
+        ]
+    },
+    {
+        "fecha": "2026-04-21 18:53:51",
+        "cliente_documento": "1234567",
+        "cliente_nombre": "ALEJO",
+        "metodo_pago": "Efectivo",
+        "total_venta": 53900,
+        "total_costo": 25600,
+        "utilidad": 28300,
+        "detalle_productos": [
+            {
+                "sabor": "Maracumango",
+                "cantidad": 23,
+                "costo_total": 9200,
+                "venta_total": 23000,
+                "ganancia": 13800
+            },
+            {
+                "sabor": "Mango Chamoy",
+                "cantidad": 19,
+                "costo_total": 15200,
+                "venta_total": 28500,
+                "ganancia": 13300
+            },
+            {
+                "sabor": "Mango Piña",
+                "cantidad": 2,
+                "costo_total": 1200,
+                "venta_total": 2400,
+                "ganancia": 1200
             }
         ]
     }

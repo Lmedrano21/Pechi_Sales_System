@@ -2,12 +2,12 @@
     "Mango Enchilado": {
         "costo": 700,
         "precio": 1500,
-        "stock": 123
+        "stock": 1
     },
     "Fusión de Sabores": {
         "costo": 893,
         "precio": 1600,
-        "stock": 63
+        "stock": 2
     },
     "Mango Super Ácido": {
         "costo": 688,
@@ -107,7 +107,7 @@
     "Mango Piña": {
         "costo": 600,
         "precio": 1200,
-        "stock": 78
+        "stock": 80
     },
     "Mango Fresa": {
         "costo": 565,
@@ -117,7 +117,7 @@
     "Mango Chamoy": {
         "costo": 800,
         "precio": 1500,
-        "stock": 41
+        "stock": 60
     },
     "Mango Biche": {
         "costo": 400,
@@ -127,7 +127,7 @@
     "Maracumango": {
         "costo": 400,
         "precio": 1000,
-        "stock": 57
+        "stock": 80
     },
     "Mango Lulo": {
         "costo": 590,
@@ -177,7 +177,7 @@
     "Arequipe Brownie": {
         "costo": 950,
         "precio": 2100,
-        "stock": 171
+        "stock": 182
     },
     "Hershey": {
         "costo": 1440,

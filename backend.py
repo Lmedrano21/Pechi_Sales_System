@@ -1,19 +1,39 @@
 import json
 import os
+import sys
 import threading
 import http.server
 import socketserver
 import webbrowser
 import urllib.parse
-import webbrowser
 from datetime import datetime
+import time
 
 # ==========================================
 # 1. CONFIGURACIÓN DE RUTAS Y VARIABLES
 # ==========================================
-ARCHIVO_BD_HELADOS = "inventario_helados.json"
-ARCHIVO_BD_CLIENTES = "clientes.json"
-ARCHIVO_BD_FACTURAS = "facturas.json"
+
+def resource_path(relative_path):
+    """ Obtiene la ruta absoluta de un recurso, funciona para dev y para PyInstaller """
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
+def data_path(relative_path):
+    """ Obtiene la ruta para archivos de datos (siempre fuera del EXE empaquetado) """
+    if getattr(sys, 'frozen', False):
+        # La aplicación se ejecuta como un bundle (.exe)
+        base_path = os.path.dirname(sys.executable)
+    else:
+        # La aplicación se ejecuta como un script (.py)
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
+ARCHIVO_BD_HELADOS = data_path("inventario_helados.json")
+ARCHIVO_BD_CLIENTES = data_path("clientes.json")
+ARCHIVO_BD_FACTURAS = data_path("facturas.json")
 
 CATALOGO = {}
 CLIENTES = {}
@@ -70,66 +90,70 @@ CATALOGO_INICIAL = {
 # ==========================================
 # 2. SISTEMA DE CARGA Y GUARDADO (PERSISTENCIA)
 # ==========================================
+def cargar_json(ruta, default):
+    if os.path.exists(ruta):
+        try:
+            with open(ruta, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except (json.JSONDecodeError, IOError):
+            pass
+    return default
+
 def inicializar_sistemas():
-    """Carga los tres archivos JSON a la memoria RAM al abrir el programa."""
+    """Carga los datos iniciales y asegura que los archivos existan en la carpeta de datos."""
     global CATALOGO, CLIENTES, FACTURAS
     
-    # 1. Cargar Helados
-    if os.path.exists(ARCHIVO_BD_HELADOS):
-        try:
-            with open(ARCHIVO_BD_HELADOS, "r", encoding="utf-8") as f:
+    # 1. Cargar Catálogo (Si no existe, intentar copiar el bundled o usar inicial)
+    if not os.path.exists(ARCHIVO_BD_HELADOS):
+        # Intentamos ver si hay uno empaquetado (como plantilla)
+        plantilla = resource_path("inventario_helados.json")
+        if os.path.exists(plantilla):
+            with open(plantilla, "r", encoding="utf-8") as f:
                 CATALOGO = json.load(f)
-        except json.JSONDecodeError:
+        else:
             CATALOGO = CATALOGO_INICIAL.copy()
-            guardar_inventario()
-    else:
-        CATALOGO = CATALOGO_INICIAL.copy()
         guardar_inventario()
+    else:
+        CATALOGO = cargar_json(ARCHIVO_BD_HELADOS, CATALOGO_INICIAL.copy())
 
     # 2. Cargar Clientes
-    if os.path.exists(ARCHIVO_BD_CLIENTES):
-        try:
-            with open(ARCHIVO_BD_CLIENTES, "r", encoding="utf-8") as f:
-                CLIENTES = json.load(f)
-        except json.JSONDecodeError:
-            CLIENTES = {}
-            guardar_clientes()
-    else:
+    if not os.path.exists(ARCHIVO_BD_CLIENTES):
         CLIENTES = {}
         guardar_clientes()
-        
-    # 3. Cargar Facturas
-    if os.path.exists(ARCHIVO_BD_FACTURAS):
-        try:
-            with open(ARCHIVO_BD_FACTURAS, "r", encoding="utf-8") as f:
-                FACTURAS = json.load(f)
-        except json.JSONDecodeError:
-            FACTURAS = []
-            guardar_facturas()
     else:
+        CLIENTES = cargar_json(ARCHIVO_BD_CLIENTES, {})
+
+    # 3. Cargar Facturas
+    if not os.path.exists(ARCHIVO_BD_FACTURAS):
         FACTURAS = []
         guardar_facturas()
+    else:
+        FACTURAS = cargar_json(ARCHIVO_BD_FACTURAS, [])
+
+def guardar_json(ruta, datos):
+    try:
+        with open(ruta, "w", encoding="utf-8") as f:
+            json.dump(datos, f, indent=4, ensure_ascii=False)
+    except IOError as e:
+        print(f"Error guardando {ruta}: {e}")
 
 def guardar_inventario():
-    with open(ARCHIVO_BD_HELADOS, "w", encoding="utf-8") as f:
-        json.dump(CATALOGO, f, indent=4, ensure_ascii=False)
+    guardar_json(ARCHIVO_BD_HELADOS, CATALOGO)
 
 def guardar_clientes():
-    with open(ARCHIVO_BD_CLIENTES, "w", encoding="utf-8") as f:
-        json.dump(CLIENTES, f, indent=4, ensure_ascii=False)
+    guardar_json(ARCHIVO_BD_CLIENTES, CLIENTES)
 
 def guardar_facturas():
-    with open(ARCHIVO_BD_FACTURAS, "w", encoding="utf-8") as f:
-        json.dump(FACTURAS, f, indent=4, ensure_ascii=False)
+    guardar_json(ARCHIVO_BD_FACTURAS, FACTURAS)
 
-# ¡DETONADOR! Se ejecuta apenas el backend se importa
+# Inicialización al importar
 inicializar_sistemas()
 
 # ==========================================
 # 3. MÓDULO DE INVENTARIO Y CATÁLOGO
 # ==========================================
 def obtener_lista_sabores():
-    return list(CATALOGO.keys())
+    return sorted(list(CATALOGO.keys()))
 
 def obtener_inventario():
     return CATALOGO
@@ -147,80 +171,126 @@ def actualizar_stock(sabor, cantidad_a_sumar):
     CATALOGO[sabor]["stock"] += cantidad
     guardar_inventario()
 
+def fijar_stock(sabor, nueva_cantidad):
+    if sabor not in CATALOGO:
+        raise ValueError("Sabor no encontrado en el catálogo.")
+    try:
+        cantidad = int(nueva_cantidad)
+    except ValueError:
+        raise ValueError("La cantidad debe ser un número entero.")
+    if cantidad < 0:
+        raise ValueError("La cantidad no puede ser negativa.")
+        
+    CATALOGO[sabor]["stock"] = cantidad
+    guardar_inventario()
+
+def registrar_producto(sabor, costo, precio, stock_inicial):
+    if sabor in CATALOGO:
+        raise ValueError("El producto ya existe.")
+    try:
+        c = float(costo)
+        p = float(precio)
+        s = int(stock_inicial)
+    except ValueError:
+        raise ValueError("Costo, Precio y Stock deben ser números válidos.")
+    
+    CATALOGO[sabor] = {"costo": c, "precio": p, "stock": s}
+    guardar_inventario()
+
+def editar_producto(sabor_actual, nuevo_sabor, nuevo_costo, nuevo_precio):
+    if sabor_actual not in CATALOGO:
+        raise ValueError("El producto no existe.")
+    
+    try:
+        c = float(nuevo_costo)
+        p = float(nuevo_precio)
+    except ValueError:
+        raise ValueError("Costo y Precio deben ser números válidos.")
+
+    # Si se cambió el nombre del sabor
+    if nuevo_sabor != sabor_actual:
+        if nuevo_sabor in CATALOGO:
+            raise ValueError("El nuevo nombre ya está en uso.")
+        # Mover los datos al nuevo nombre
+        datos = CATALOGO.pop(sabor_actual)
+        CATALOGO[nuevo_sabor] = datos
+        sabor_actual = nuevo_sabor
+
+    CATALOGO[sabor_actual]["costo"] = c
+    CATALOGO[sabor_actual]["precio"] = p
+    guardar_inventario()
+
+def eliminar_producto(sabor):
+    if sabor not in CATALOGO:
+        raise ValueError("El producto no existe.")
+    del CATALOGO[sabor]
+    guardar_inventario()
+
 # ==========================================
 # 4. MÓDULO DE CLIENTES
 # ==========================================
 def obtener_clientes():
     return CLIENTES
 
-def registrar_cliente(documento, nombre, telefono):
-    if not documento.strip() or not nombre.strip() or not telefono.strip():
+def registrar_cliente(documento, nombre, telefono, direccion):
+    if not documento.strip() or not nombre.strip() or not telefono.strip() or not direccion.strip():
         raise ValueError("Todos los campos son obligatorios.")
     if documento in CLIENTES:
         raise ValueError(f"Ya existe un cliente con el documento {documento}.")
     
-    CLIENTES[documento] = {
-        "nombre": nombre,
-        "telefono": telefono
-    }
+    CLIENTES[documento] = {"nombre": nombre, "telefono": telefono, "direccion": direccion}
+    guardar_clientes()
+
+def editar_cliente(documento, nuevo_nombre, nuevo_telefono, nueva_direccion):
+    if not documento.strip() or not nuevo_nombre.strip() or not nuevo_telefono.strip() or not nueva_direccion.strip():
+        raise ValueError("Todos los campos son obligatorios.")
+    if documento not in CLIENTES:
+        raise ValueError(f"No existe un cliente con el documento {documento}.")
+    
+    CLIENTES[documento] = {"nombre": nuevo_nombre, "telefono": nuevo_telefono, "direccion": nueva_direccion}
+    guardar_clientes()
+
+def eliminar_cliente(documento):
+    if documento not in CLIENTES:
+        raise ValueError(f"No existe un cliente con el documento {documento}.")
+    del CLIENTES[documento]
     guardar_clientes()
 
 # ==========================================
-# 5. MÓDULO DE VENTAS RÁPIDAS (CAJA ÚNICA)
+# 5. MÓDULO DE VENTAS Y FACTURACIÓN
 # ==========================================
-def procesar_venta(sabor_seleccionado, cantidad_input):
+def procesar_venta(sabor_seleccionado, cantidad_input, metodo_pago="Efectivo"):
     """Calcula el total, descuenta el stock y guarda la venta anónima."""
-    if sabor_seleccionado not in CATALOGO:
-        raise ValueError("Por favor, selecciona un sabor válido.")
-    try:
-        cantidad = int(cantidad_input)
-    except ValueError:
-        raise ValueError("La cantidad debe ser un número entero.")
-    if cantidad <= 0:
-        raise ValueError("La cantidad debe ser mayor a cero.")
-        
-    stock_actual = CATALOGO[sabor_seleccionado]["stock"]
-    if cantidad > stock_actual:
-        raise ValueError(f"Stock insuficiente. Quedan {stock_actual} unidades.")
-    
-    costo_t = CATALOGO[sabor_seleccionado]["costo"] * cantidad
-    venta_t = CATALOGO[sabor_seleccionado]["precio"] * cantidad
-    ganancia = venta_t - costo_t
+    detalle = cotizar_item(sabor_seleccionado, cantidad_input)
     
     # 1. Descontamos el inventario
-    CATALOGO[sabor_seleccionado]["stock"] -= cantidad
+    CATALOGO[sabor_seleccionado]["stock"] -= detalle['cantidad']
     guardar_inventario()
     
-    # 2. Generamos la factura anónima para que aparezca en el Dashboard
+    # 2. Generamos la factura anónima
     factura_anonima = {
         "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "cliente_documento": "00000000",
         "cliente_nombre": "Cliente Casual",
-        "total_venta": venta_t,
-        "total_costo": costo_t,
-        "utilidad": ganancia,
+        "metodo_pago": metodo_pago,
+        "total_venta": detalle['venta_total'],
+        "total_costo": detalle['costo_total'],
+        "utilidad": detalle['ganancia'],
         "detalle_productos": [{
-            "sabor": sabor_seleccionado,
-            "cantidad": cantidad,
-            "costo_total": costo_t,
-            "venta_total": venta_t
+            "sabor": detalle['sabor'],
+            "cantidad": detalle['cantidad'],
+            "costo_total": detalle['costo_total'],
+            "venta_total": detalle['venta_total']
         }]
     }
     FACTURAS.append(factura_anonima)
     guardar_facturas()
     
-    return {
-        "sabor": sabor_seleccionado, "cantidad": cantidad,
-        "costo_total": costo_t, "venta_total": venta_t, "ganancia": ganancia
-    }
+    return detalle
 
-# ==========================================
-# 6. MÓDULO DE FACTURACIÓN (CARRITO Y PEDIDOS)
-# ==========================================
-def cotizar_item(sabor_seleccionado, cantidad_input):
-    """Calcula el total para el carrito (NO descuenta stock aún)."""
-    if sabor_seleccionado not in CATALOGO:
-        raise ValueError("Por favor, selecciona un sabor válido.")
+def cotizar_item(sabor, cantidad_input):
+    if sabor not in CATALOGO:
+        raise ValueError("Selecciona un sabor válido.")
     try:
         cantidad = int(cantidad_input)
     except ValueError:
@@ -228,221 +298,155 @@ def cotizar_item(sabor_seleccionado, cantidad_input):
     if cantidad <= 0:
         raise ValueError("La cantidad debe ser mayor a cero.")
         
-    stock_actual = CATALOGO[sabor_seleccionado]["stock"]
+    stock_actual = CATALOGO[sabor]["stock"]
     if cantidad > stock_actual:
-        raise ValueError(f"Stock insuficiente. Quedan {stock_actual} unidades.")
+        raise ValueError(f"Stock insuficiente para {sabor}. Quedan {stock_actual} unidades.")
     
-    costo_t = CATALOGO[sabor_seleccionado]["costo"] * cantidad
-    venta_t = CATALOGO[sabor_seleccionado]["precio"] * cantidad
+    costo_t = CATALOGO[sabor]["costo"] * cantidad
+    venta_t = CATALOGO[sabor]["precio"] * cantidad
     
     return {
-        "sabor": sabor_seleccionado, "cantidad": cantidad,
+        "sabor": sabor, "cantidad": cantidad,
         "costo_total": costo_t, "venta_total": venta_t, "ganancia": (venta_t - costo_t)
     }
 
-def procesar_factura_completa(documento_cliente, carrito):
-    """Descuenta el stock final y guarda el recibo detallado."""
+def procesar_factura_completa(documento_cliente, carrito, metodo_pago="Efectivo"):
     if documento_cliente not in CLIENTES:
-        raise ValueError("El cliente seleccionado no es válido o no existe.")
+        raise ValueError("El cliente seleccionado no es válido.")
         
     # Doble verificación de stock
     for item in carrito:
         if CATALOGO[item["sabor"]]["stock"] < item["cantidad"]:
-            raise ValueError(f"Falta stock de {item['sabor']} (Quedan {CATALOGO[item['sabor']]['stock']}).")
+            raise ValueError(f"Falta stock de {item['sabor']}.")
 
-    # Descontar el stock real
-    total_venta_factura = 0
-    total_costo_factura = 0
-    
+    total_venta = 0
+    total_costo = 0
     for item in carrito:
         sabor = item["sabor"]
         CATALOGO[sabor]["stock"] -= item["cantidad"]
-        total_venta_factura += item["venta_total"]
-        total_costo_factura += item["costo_total"]
+        total_venta += item["venta_total"]
+        total_costo += item["costo_total"]
 
     guardar_inventario()
 
-    # Generar factura con fecha
     nueva_factura = {
         "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "cliente_documento": documento_cliente,
         "cliente_nombre": CLIENTES[documento_cliente]["nombre"],
-        "total_venta": total_venta_factura,
-        "total_costo": total_costo_factura,
-        "utilidad": total_venta_factura - total_costo_factura,
+        "metodo_pago": metodo_pago,
+        "total_venta": total_venta,
+        "total_costo": total_costo,
+        "utilidad": total_venta - total_costo,
         "detalle_productos": carrito
     }
-    
     FACTURAS.append(nueva_factura)
     guardar_facturas()
+    return nueva_factura
 
 # ==========================================
-# 7. MÓDULO DE SERVIDOR WEB (DASHBOARD)
+# 6. MÓDULO DE SERVIDOR WEB (DASHBOARD)
 # ==========================================
 servidor_activo = False
 
+class MiManejadorHTTP(http.server.BaseHTTPRequestHandler):
+    def do_GET(self):
+        try:
+            ruta_solicitada = urllib.parse.unquote(self.path).split('?')[0]
+            if ruta_solicitada == '/': ruta_solicitada = '/index.html'
+            
+            # Las peticiones JSON (datos) van a la carpeta de datos (junto al EXE)
+            # Todo lo demás (HTML, JS, CSS) va a la carpeta de recursos (empaquetado)
+            if ruta_solicitada.endswith('.json'):
+                ruta_completa = data_path(ruta_solicitada.lstrip('/'))
+            else:
+                ruta_completa = resource_path(ruta_solicitada.lstrip('/'))
+            
+            if os.path.isfile(ruta_completa):
+                with open(ruta_completa, 'rb') as f:
+                    contenido = f.read()
+                self.send_response(200)
+                self.send_type_headers(ruta_completa)
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
+                self.send_header('Content-Length', len(contenido))
+                self.end_headers()
+                self.wfile.write(contenido)
+            else:
+                self.send_error(404, "Archivo no encontrado")
+        except Exception as e:
+            print(f"Error servidor: {e}")
+            try: self.send_error(500, str(e))
+            except: pass
+    
+    def send_type_headers(self, path):
+        types = {'.json': 'application/json', '.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css'}
+        ext = os.path.splitext(path)[1]
+        self.send_header('Content-type', f"{types.get(ext, 'application/octet-stream')}; charset=utf-8")
+
+    def log_message(self, format, *args): pass
+
 def lanzar_dashboard():
     global servidor_activo
-    puerto = 8000
-
     if not servidor_activo:
         def arrancar_servidor():
-            Handler = http.server.SimpleHTTPRequestHandler
-            socketserver.TCPServer.allow_reuse_address = True
             try:
-                with socketserver.TCPServer(("", puerto), Handler) as httpd:
+                socketserver.TCPServer.allow_reuse_address = True
+                with socketserver.TCPServer(("", 8000), MiManejadorHTTP) as httpd:
                     httpd.serve_forever()
-            except Exception as e:
-                print(f"Error en el servidor: {e}")
+            except Exception as e: print(f"Error servidor x: {e}")
 
-        # Hilo en segundo plano para no congelar la ventana de Tkinter
-        hilo_web = threading.Thread(target=arrancar_servidor, daemon=True)
-        hilo_web.start()
+        threading.Thread(target=arrancar_servidor, daemon=True).start()
         servidor_activo = True
+        time.sleep(1)
+    webbrowser.open("http://localhost:8000")
 
-    # Abrir el navegador automáticamente
-    webbrowser.open(f"http://localhost:{puerto}")
-    
+# ==========================================
+# 7. COMUNICACIÓN Y EXPORTACIÓN
+# ==========================================
 def enviar_factura_whatsapp(documento_cliente, carrito, total_venta):
-    # 1. Obtenemos el teléfono del diccionario de clientes
     if documento_cliente not in CLIENTES:
         raise ValueError("Cliente no encontrado.")
         
     telefono = CLIENTES[documento_cliente]["telefono"]
     nombre = CLIENTES[documento_cliente]["nombre"]
-    
-    # IMPORTANTE: WhatsApp requiere el código de país. 
-    # Asumiendo que estamos en Colombia (+57), lo agregamos si no lo tiene.
-    if not telefono.startswith("57") and not telefono.startswith("+57"):
+    if not (telefono.startswith("57") or telefono.startswith("+57")):
         telefono = "57" + telefono
-        
-    # Limpiamos el símbolo '+' si lo tiene para la URL
-    telefono = telefono.replace("+", "")
+    telefono = telefono.replace("+", "").strip()
 
-    # 2. Armamos el diseño del ticket usando formato de WhatsApp
-    mensaje = f"🍦 *HELADERÍA POS* 🍦\n"
-    mensaje += f"Hola _{nombre}_, gracias por tu compra.\n"
-    mensaje += f"Aquí tienes el resumen de tu pedido:\n\n"
-    
+    mensaje = f"🍦 *HELADERÍA POS* 🍦\nHola _{nombre}_, resumen pedido:\n\n"
     for item in carrito:
         mensaje += f"▪️ {item['cantidad']}x {item['sabor']}: ${item['venta_total']:,}\n"
-        
-    mensaje += f"\n💰 *TOTAL A PAGAR: ${total_venta:,}*\n\n"
-    mensaje += f"¡Esperamos verte pronto!"
+    mensaje += f"\n💰 *TOTAL: ${total_venta:,}*\n¡Gracias!"
 
-    # 3. Convertimos el texto normal a texto codificado para URL (ej. espacios a %20)
-    texto_codificado = urllib.parse.quote(mensaje)
+    webbrowser.open(f"https://wa.me/{telefono}?text={urllib.parse.quote(mensaje)}")
 
-    # 4. Creamos el link de WhatsApp Web
-    # Cambiamos web.whatsapp.com por wa.me (es más directo y compatible)
-    enlace_whatsapp = f"https://wa.me/{telefono}?text={texto_codificado}"
-
-    # 5. Le decimos a Python que abra el navegador
-    webbrowser.open(enlace_whatsapp)
-
-# ==========================================
-# 8. MÓDULO DE HISTORIAL Y ANULACIONES
-# ==========================================
 def obtener_facturas():
-    """Devuelve la lista completa de facturas."""
     return FACTURAS
 
 def anular_factura(fecha_id):
-    """Busca la factura, regresa los helados al stock y elimina el registro."""
     global FACTURAS
-    factura_objetivo = None
-    
-    # 1. Buscamos la factura por su fecha exacta
-    for factura in FACTURAS:
-        if factura["fecha"] == fecha_id:
-            factura_objetivo = factura
-            break
-            
-    if not factura_objetivo:
-        raise ValueError("No se encontró la factura en la base de datos.")
+    factura = next((f for f in FACTURAS if f["fecha"] == fecha_id), None)
+    if not factura:
+        raise ValueError("Factura no encontrada.")
         
-    # 2. Devolvemos los productos al inventario
-    for item in factura_objetivo["detalle_productos"]:
-        sabor = item["sabor"]
-        cantidad = item["cantidad"]
-        # Validamos que el sabor siga existiendo en el catálogo
-        if sabor in CATALOGO:
-            CATALOGO[sabor]["stock"] += cantidad
+    for item in factura["detalle_productos"]:
+        if item["sabor"] in CATALOGO:
+            CATALOGO[item["sabor"]]["stock"] += item["cantidad"]
             
-    # Guardamos el inventario recuperado
+    FACTURAS.remove(factura)
     guardar_inventario()
-    
-    # 3. Eliminamos la factura del historial y guardamos
-    FACTURAS.remove(factura_objetivo)
     guardar_facturas()
 
 def exportar_factura_txt(fecha_id):
-    """Crea un archivo de texto con el formato del recibo y lo abre."""
-    factura_objetivo = None
-    for factura in FACTURAS:
-        if factura["fecha"] == fecha_id:
-            factura_objetivo = factura
-            break
-            
-    if not factura_objetivo:
-        raise ValueError("No se encontró la factura.")
+    factura = next((f for f in FACTURAS if f["fecha"] == fecha_id), None)
+    if not factura: raise ValueError("Factura no encontrada.")
         
-    # Limpiamos los dos puntos (:) porque Windows no permite guardar archivos con ese símbolo
-    fecha_limpia = fecha_id.replace(":", "-").replace(" ", "_")
-    nombre_archivo = f"Factura_{fecha_limpia}.txt"
-    
-    # Creamos y dibujamos el archivo de texto
+    nombre_archivo = f"Factura_{fecha_id.replace(':', '-').replace(' ', '_')}.txt"
     with open(nombre_archivo, "w", encoding="utf-8") as f:
-        f.write("="*40 + "\n")
-        f.write("             HELADERÍA POS             \n")
-        f.write("="*40 + "\n")
-        f.write(f"FECHA: {factura_objetivo['fecha']}\n")
-        f.write(f"CLIENTE: {factura_objetivo['cliente_nombre']}\n")
-        f.write(f"DOCUMENTO: {factura_objetivo['cliente_documento']}\n")
-        f.write("-" * 40 + "\n")
-        f.write("CANT  | PRODUCTO                  | TOTAL\n")
-        f.write("-" * 40 + "\n")
-        
-        for item in factura_objetivo["detalle_productos"]:
-            # Formateo para que se vea alineado como un ticket real
+        f.write("="*40 + "\n          HELADERÍA POS\n" + "="*40 + "\n")
+        f.write(f"FECHA: {factura['fecha']}\nCLIENTE: {factura['cliente_nombre']}\nDOC: {factura['cliente_documento']}\n" + "-"*40 + "\n")
+        f.write("CANT  | PRODUCTO                  | TOTAL\n" + "-"*40 + "\n")
+        for item in factura["detalle_productos"]:
             f.write(f"{item['cantidad']:<5} | {item['sabor']:<23} | ${item['venta_total']:,}\n")
-            
-        f.write("-" * 40 + "\n")
-        f.write(f"TOTAL PAGADO:                 ${factura_objetivo['total_venta']:,}\n")
-        f.write("="*40 + "\n")
-        f.write("        ¡Gracias por su compra!        \n")
-        
-    # Le decimos a Windows que abra el bloc de notas automáticamente con este archivo
+        f.write("-" * 40 + f"\nTOTAL PAGADO:                 ${factura['total_venta']:,}\n" + "="*40 + "\n      ¡Gracias por su compra!\n")
     os.startfile(nombre_archivo)
-# Asegúrate de tener esto arriba en tu backend.py:
-# import urllib.parse
-# import webbrowser
-
-def enviar_factura_whatsapp(documento_cliente, carrito, total_venta):
-    if documento_cliente not in CLIENTES:
-        raise ValueError("Cliente no encontrado.")
-        
-    telefono = CLIENTES[documento_cliente]["telefono"]
-    nombre = CLIENTES[documento_cliente]["nombre"]
-    
-    # Agregamos el indicativo de Colombia (+57) si no lo tiene
-    if not telefono.startswith("57") and not telefono.startswith("+57"):
-        telefono = "57" + telefono
-    telefono = telefono.replace("+", "")
-
-    # Armamos el mensaje
-    mensaje = f"🍦 *HELADERÍA POS* 🍦\n"
-    mensaje += f"Hola _{nombre}_, gracias por tu compra.\n"
-    mensaje += f"Aquí tienes el resumen de tu pedido:\n\n"
-    
-    for item in carrito:
-        mensaje += f"▪️ {item['cantidad']}x {item['sabor']}: ${item['venta_total']:,}\n"
-        
-    mensaje += f"\n💰 *TOTAL A PAGAR: ${total_venta:,}*\n\n"
-    mensaje += f"¡Esperamos verte pronto!"
-
-    import urllib.parse
-    import webbrowser
-    texto_codificado = urllib.parse.quote(mensaje)
-    enlace_whatsapp = f"https://wa.me/{telefono}?text={texto_codificado}"
-    webbrowser.open(enlace_whatsapp)

@@ -1,0 +1,38 @@
+[
+    {
+        "fecha": "2026-04-21 16:11:25",
+        "cliente_documento": "11",
+        "cliente_nombre": "Luis",
+        "metodo_pago": "Efectivo",
+        "total_venta": 466200,
+        "total_costo": 210900,
+        "utilidad": 255300,
+        "detalle_productos": [
+            {
+                "sabor": "Arequipe Brownie",
+                "cantidad": 222,
+                "costo_total": 210900,
+                "venta_total": 466200,
+                "ganancia": 255300
+            }
+        ]
+    },
+    {
+        "fecha": "2026-04-21 19:02:41",
+        "cliente_documento": "11",
+        "cliente_nombre": "Luis",
+        "metodo_pago": "Efectivo",
+        "total_venta": 97600,
+        "total_costo": 54473,
+        "utilidad": 43127,
+        "detalle_productos": [
+            {
+                "sabor": "Fusión de Sabores",
+                "cantidad": 61,
+                "costo_total": 54473,
+                "venta_total": 97600,
+                "ganancia": 43127
+            }
+        ]
+    }
+]

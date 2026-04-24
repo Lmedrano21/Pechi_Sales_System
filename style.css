@@ -23,8 +23,8 @@ header {
 
 /* Estilos de las Tarjetas */
 .tarjetas-kpi {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
     margin-bottom: 30px;
 }
@@ -96,14 +96,39 @@ canvas#graficoVentas {
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
+.tabla-scroll {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #eee;
+    border-radius: 5px;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 10px;
 }
 
 th, td {
-    padding: 8px;
+    padding: 10px 8px;
     text-align: left;
     border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f0f0f0;
+    font-weight: bold;
+    color: #333;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+tr:hover {
+    background-color: #f9f9f9;
+}
+
+#tabla-productos-completa td:nth-child(2),
+#tabla-productos-completa td:nth-child(3) {
+    text-align: right;
+    font-weight: 500;
 }
